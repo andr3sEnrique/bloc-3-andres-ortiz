@@ -16,7 +16,6 @@ dotenv.config()
 
 const JWT_SECRET = process.env.JWT_SECRET
 
-
 function authenticateToken(req, res, next) {
     const token = req.cookies.token
     if (!token) return res.sendStatus(401)
@@ -35,7 +34,7 @@ function isAdmin(req, res, next) {
         res.status(403).json({ error: 'Accès refusé. Droits administrateur requis.' })
     }
 }
-// Configuración CORS corregida - solo tu frontend
+
 const corsOptions = {
     origin: ["http://localhost:5173", "http://localhost:3000"],
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
@@ -43,10 +42,9 @@ const corsOptions = {
     optionsSuccessStatus: 204
 }
 
-// Rate Limiting - protección contra ataques de fuerza bruta
 const generalLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutos
-    max: 100, // máximo 100 requests por IP por ventana
+    windowMs: 15 * 60 * 1000,
+    max: 100,
     message: {
         error: 'Trop de requêtes, veuillez réessayer plus tard.'
     },
@@ -55,8 +53,8 @@ const generalLimiter = rateLimit({
 })
 
 const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutos
-    max: 5, // máximo 5 intentos de login por IP por ventana
+    windowMs: 15 * 60 * 1000,
+    max: 5,
     message: {
         error: 'Trop de tentatives de connexion, veuillez réessayer plus tard.'
     },
@@ -66,22 +64,20 @@ const authLimiter = rateLimit({
 
 const router = express.Router()
 
-// Aplicar middlewares de seguridad
 router.use(helmet())
 router.use(bodyParser.json({ limit: '10mb' }))
 router.use(cors(corsOptions))
 router.use(cookieParser())
 router.use(generalLimiter)
-router.use('/api/users', authLimiter); // Rate limiting específico para autenticación
+router.use('/api/users', authLimiter);
 router.use('/api/users', usersRouter);
-router.use('/api/books', booksrouter); // Sin CSRF
-router.use('/api/emprunts', empruntsRouter); // Sin CSRF
+router.use('/api/books', booksrouter);
+router.use('/api/emprunts', empruntsRouter);
 
 router.post('/api/logout', authenticateToken, (req, res) => {
-    // Invalidar el token en el servidor (opcional: mantener lista negra)
     res.clearCookie('token', {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production', // true en producción
+        secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         path: '/'
     });
@@ -112,7 +108,6 @@ router.get('/api/statistics', (req, res) => {
     });
 });
 
-// Ruta para probar manualmente las notificaciones de préstamos vencidos
 router.post('/api/test-overdue-notifications', authenticateToken, isAdmin, async (req, res) => {
     try {
         const { processOverdueLoans } = require('./mail-cron');
@@ -137,7 +132,6 @@ router.post('/api/test-overdue-notifications', authenticateToken, isAdmin, async
     }
 });
 
-// Ruta para obtener la lista de préstamos vencidos (solo admin)
 router.get('/api/overdue-loans', authenticateToken, isAdmin, async (req, res) => {
     try {
         const { getOverdueLoans } = require('./mail-cron');

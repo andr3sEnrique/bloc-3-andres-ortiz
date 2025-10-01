@@ -4,11 +4,10 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { body, validationResult } = require('express-validator');
 const db = require('./../services/database')
-const { authenticateToken, isAdmin } = require('./utils');
+const { authenticateToken } = require('./utils');
 const dotenv = require('dotenv')
 dotenv.config()
 
-const JWT_SECRET = process.env.JWT_SECRET
 
 const fieldValidations = [
     body('livre_id').notEmpty().isInt().withMessage('ID du livre requis'),

@@ -204,7 +204,7 @@ describe('Emprunts Tests', () => {
       expect(Array.isArray(response.body)).toBe(true);
       expect(response.body).toHaveLength(2);
       
-      // Verificar que se agregó el status
+
       expect(response.body[0]).toHaveProperty('status');
       expect(response.body[1]).toHaveProperty('status');
       expect(response.body[1].status).toBe('retourné');

@@ -1,7 +1,6 @@
 const { CronJob } = require('cron');
 const { processOverdueLoans } = require('./mail-cron');
 
-// Cron job para notificaciones de préstamos vencidos
 const overdueNotificationJob = new CronJob(
   '0 20 17 * * *',
   async function () {
@@ -36,52 +35,10 @@ const overdueNotificationJob = new CronJob(
   () => {
     console.log('📧 Job de notification des emprunts en retard arrêté.');
   },
-  true, // Démarrer automatiquement
-  'Europe/Paris' // Fuseau horaire
-);
-
-// Job de test (optionnel) - s'exécute toutes les heures pour les tests
-const testJob = new CronJob(
-  '0 0 * * * *', // Toutes les heures à la minute 0
-  async function () {
-    const now = new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' });
-    console.log(`🧪 [${now}] Test job - Vérification du système de notifications...`);
-    
-    try {
-      // Juste vérifier la connexion à la base de données
-      const { getOverdueLoans } = require('./mail-cron');
-      const overdueLoans = await getOverdueLoans();
-      console.log(`📊 Emprunts en retard actuellement: ${overdueLoans.length}`);
-      
-      if (overdueLoans.length > 0) {
-        console.log(`📋 Détails:`);
-        overdueLoans.forEach((loan, index) => {
-          console.log(`   ${index + 1}. ${loan.prenom} ${loan.nom} - "${loan.titre}" (${loan.jours_retard} jour(s) de retard)`);
-        });
-      }
-      
-    } catch (error) {
-      console.error('❌ Erreur lors du test:', error.message);
-    }
-  },
-  null,
-  false, // Ne pas démarrer automatiquement (pour les tests seulement)
+  true,
   'Europe/Paris'
 );
 
-// Fonction pour démarrer le job de test manuellement
-const startTestJob = () => {
-  console.log('🧪 Démarrage du job de test...');
-  testJob.start();
-};
-
-// Fonction pour arrêter le job de test
-const stopTestJob = () => {
-  console.log('🛑 Arrêt du job de test...');
-  testJob.stop();
-};
-
-// Fonction pour exécuter une vérification manuelle
 const runManualCheck = async () => {
   console.log('🔍 Exécution manuelle de la vérification des emprunts en retard...');
   try {
@@ -94,15 +51,10 @@ const runManualCheck = async () => {
   }
 };
 
-// Logs de démarrage
 console.log('📧 Système de notification des emprunts en retard initialisé');
 console.log('⏰ Prochaine exécution programmée:', overdueNotificationJob.nextDate().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' }));
 
-// Exporter les fonctions utiles
 module.exports = {
   overdueNotificationJob,
-  testJob,
-  startTestJob,
-  stopTestJob,
   runManualCheck
 };

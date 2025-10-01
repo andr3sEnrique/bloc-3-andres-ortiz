@@ -11,7 +11,7 @@ const createSMTPTransporter = () => {
       pass: "npra sbva znbm ymzv",
     },
   };
-  return nodemailer.createTransporter(smtpConfig);
+  return nodemailer.createTransport(smtpConfig);
 };
 
 const getOverdueLoans = () => {
@@ -45,7 +45,6 @@ const getOverdueLoans = () => {
   });
 };
 
-// Función para enviar email de recordatorio
 const sendOverdueNotification = async (userInfo) => {
   const transporter = createSMTPTransporter();
   
@@ -179,71 +178,8 @@ const processOverdueLoans = async () => {
   }
 };
 
-// Fonction de test (garde l'ancienne pour compatibilité)
-const sendTestMail = async (name, counter) => {
-  const transporter = createSMTPTransporter();
-  const options = {
-    from: "oenrique23415@gmail.com",
-    to: "services@nebulia.tech",
-    subject: "Test avec mot de passe Brut",
-    text: "Hello there, this is a test email",
-    html: `<center>
-<table style="width: 100%; max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; border-collapse: collapse;">
-  <tr>
-    <td style="background-color: #f4f4f4; padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
-      <img src="https://via.placeholder.com/150x50?text=Logo+Entreprise" alt="Logo" style="max-width: 150px;">
-    </td>
-  </tr>
-  <tr>
-    <td style="background-color: #ffffff; padding: 30px; text-align: center;">
-      <h1 style="color: #2c3e50; margin-bottom: 20px;">Bonjour, c'est ${name}, voici le compteur : ${counter}</h1>
-    
-      <p style="color: #7f8c8d; font-size: 16px; line-height: 1.5;">
-        Ceci est un <strong>mail test</strong> pour vérifier l'affichage et le style.
-        Tu peux personnaliser ce modèle avec tes propres couleurs, images et contenu.
-      </p>
-      <div style="margin: 25px 0; background-color: #e8f4fc; padding: 15px; border-radius: 5px; border-left: 4px solid #3498db;">
-        <p style="color: #2980b9; margin: 0;">
-          <strong>Message important :</strong> Ce mail est un exemple de design responsive et moderne.
-        </p>
-      </div>
-      <a href="https://exemple.com" style="display: inline-block; background-color: #3498db; color: #ffffff; text-decoration: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; margin-top: 20px;">
-        Découvrir plus
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td style="background-color: #f4f4f4; padding: 20px; text-align: center; border-radius: 0 0 10px 10px; font-size: 14px; color: #7f8c8d;">
-      <p>© 2025 [Nom de ton entreprise]. Tous droits réservés.</p>
-      <p>
-        <a href="https://exemple.com/confidentialite" style="color: #3498db; text-decoration: none; margin: 0 10px;">Confidentialité</a> |
-        <a href="https://exemple.com/contact" style="color: #3498db; text-decoration: none; margin: 0 10px;">Contact</a>
-      </p>
-    </td>
-  </tr>
-</table>
-</center>`,
-  };
-  await transporter.sendMail(options);
-};
-
-// Función legacy para compatibilidad
-const linkStart = async (counter) => {
-  try {
-    // Cambiar a la nueva funcionalidad
-    const result = await processOverdueLoans();
-    console.log("Traitement des emprunts en retard terminé:", result.message);
-    return result;
-  } catch (error) {
-    console.log("Erreur:", error);
-    throw error;
-  }
-};
-
 module.exports = { 
-  linkStart, 
   processOverdueLoans, 
-  sendTestMail,
   getOverdueLoans,
   sendOverdueNotification 
 };
