@@ -1,5 +1,7 @@
 const nodemailer = require("nodemailer");
 const db = require('./services/database');
+const dotenv = require('dotenv')
+dotenv.config()
 
 const createSMTPTransporter = () => {
   const smtpConfig = {
@@ -7,8 +9,8 @@ const createSMTPTransporter = () => {
     port: 465,
     secure: true,
     auth: {
-      user: "oenrique23415@gmail.com",
-      pass: "npra sbva znbm ymzv",
+      user: process.env.MAIL,
+      pass: process.env.MAIL_KEY,
     },
   };
   return nodemailer.createTransport(smtpConfig);
