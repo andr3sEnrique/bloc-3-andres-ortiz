@@ -2,7 +2,7 @@ const request = require('supertest');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 
-// Mock de la base de datos
+
 jest.mock('../../../services/database', () => global.mockDb);
 
 describe('Emprunts Tests', () => {
@@ -13,18 +13,18 @@ describe('Emprunts Tests', () => {
     app.use(express.json());
     app.use(cookieParser());
     
-    // Mock simple de autenticación
+
     const authenticateToken = (req, res, next) => {
       const token = req.cookies?.token;
       if (!token) {
         return res.status(401).json({ error: 'Token manquant' });
       }
-      // Simular usuario autenticado
+
       req.user = { id: 1, email: 'test@example.com', role: 'utilisateur' };
       next();
     };
 
-    // Rutas simplificadas para tests
+
     app.get('/api/emprunts', authenticateToken, (req, res) => {
       const userId = req.user.id;
       const sql = `
@@ -76,7 +76,7 @@ describe('Emprunts Tests', () => {
         return res.status(400).json({ error: 'Données manquantes' });
       }
 
-      // Verificar que el libro esté disponible
+
       const checkBookSql = 'SELECT statut FROM livres WHERE id = ?';
       global.mockDb.query(checkBookSql, [livre_id], (err, bookResults) => {
         if (err) {
@@ -91,14 +91,14 @@ describe('Emprunts Tests', () => {
           return res.status(400).json({ error: 'Livre non disponible' });
         }
 
-        // Crear el emprunt
+
         const insertEmpruntSql = 'INSERT INTO emprunts (livre_id, utilisateur_id, date_retour_prevue) VALUES (?, ?, ?)';
         global.mockDb.query(insertEmpruntSql, [livre_id, utilisateur_id, date_retour_prevue], (err, result) => {
           if (err) {
             return res.status(500).json({ error: 'Erreur lors de la création de l\'emprunt' });
           }
 
-          // Actualizar el statut del libro
+
           const updateBookSql = 'UPDATE livres SET statut = ? WHERE id = ?';
           global.mockDb.query(updateBookSql, ['emprunté', livre_id], (err) => {
             if (err) {
@@ -118,7 +118,7 @@ describe('Emprunts Tests', () => {
       const empruntId = req.params.id;
       const userId = req.user.id;
       
-      // Verificar que el emprunt pertenece al usuario
+
       const checkEmpruntSql = `
         SELECT e.*, l.id as livre_id 
         FROM emprunts e 
@@ -138,14 +138,14 @@ describe('Emprunts Tests', () => {
         const emprunt = empruntResults[0];
         const currentDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-        // Marquer l'emprunt comme retourné
+
         const updateEmpruntSql = 'UPDATE emprunts SET date_retour_effective = ? WHERE id = ?';
         global.mockDb.query(updateEmpruntSql, [currentDate, empruntId], (err) => {
           if (err) {
             return res.status(500).json({ error: 'Erreur lors de la mise à jour de l\'emprunt' });
           }
 
-          // Marquer le livre comme disponible
+
           const updateBookSql = 'UPDATE livres SET statut = ? WHERE id = ?';
           global.mockDb.query(updateBookSql, ['disponible', emprunt.livre_id], (err) => {
             if (err) {
@@ -161,7 +161,7 @@ describe('Emprunts Tests', () => {
       });
     });
     
-    // Reset mocks
+
     jest.clearAllMocks();
   });
 
@@ -233,7 +233,7 @@ describe('Emprunts Tests', () => {
 
     test('should calculate delayed status correctly', async () => {
       const pastDate = new Date();
-      pastDate.setDate(pastDate.getDate() - 10); // 10 días atrás
+      pastDate.setDate(pastDate.getDate() - 10);
 
       const mockEmprunts = [
         {
@@ -269,18 +269,18 @@ describe('Emprunts Tests', () => {
     };
 
     test('should create emprunt successfully', async () => {
-      // Mock database responses
+
       global.mockDb.query
         .mockImplementationOnce((sql, params, callback) => {
-          // Check book availability
+
           callback(null, [{ statut: 'disponible' }]);
         })
         .mockImplementationOnce((sql, params, callback) => {
-          // Insert emprunt
+
           callback(null, { insertId: 1 });
         })
         .mockImplementationOnce((sql, params, callback) => {
-          // Update book status
+
           callback(null, { affectedRows: 1 });
         });
 
@@ -320,7 +320,7 @@ describe('Emprunts Tests', () => {
     });
 
     test('should return 404 if book not found', async () => {
-      // Mock database response - no book found
+
       global.mockDb.query.mockImplementationOnce((sql, params, callback) => {
         callback(null, []);
       });
@@ -335,7 +335,7 @@ describe('Emprunts Tests', () => {
     });
 
     test('should return 400 if book not available', async () => {
-      // Mock database response - book not available
+
       global.mockDb.query.mockImplementationOnce((sql, params, callback) => {
         callback(null, [{ statut: 'emprunté' }]);
       });
@@ -361,15 +361,15 @@ describe('Emprunts Tests', () => {
 
       global.mockDb.query
         .mockImplementationOnce((sql, params, callback) => {
-          // Check emprunt exists and belongs to user
+
           callback(null, [mockEmprunt]);
         })
         .mockImplementationOnce((sql, params, callback) => {
-          // Update emprunt with return date
+
           callback(null, { affectedRows: 1 });
         })
         .mockImplementationOnce((sql, params, callback) => {
-          // Update book status to available
+
           callback(null, { affectedRows: 1 });
         });
 
@@ -392,7 +392,7 @@ describe('Emprunts Tests', () => {
     });
 
     test('should return 404 if emprunt not found', async () => {
-      // Mock database response - no emprunt found
+
       global.mockDb.query.mockImplementationOnce((sql, params, callback) => {
         callback(null, []);
       });
