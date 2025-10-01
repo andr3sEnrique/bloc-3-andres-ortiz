@@ -1,13 +1,17 @@
+require('dotenv').config()
 const express = require('express')
 const server = require('./server')
+const path = require('path')
 
 const app = express()
 
-app.use(`${baseUrl}/`,server)
+// Inicializar el sistema de notificaciones de préstamos vencidos
+const { overdueNotificationJob } = require('./cron-job')
 
-app.get(`${baseUrl}/*`, (req, res) => {
-  res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
-});
+app.use('/', server)
+
 app.listen(3000, () => {
-    console.info('server démarré')
+    console.info('🚀 Serveur démarré sur le port 3000')
+    console.info('📧 Système de notifications des emprunts en retard activé')
+    console.info('⏰ Prochaine vérification programmée:', overdueNotificationJob.nextDate().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' }))
 })

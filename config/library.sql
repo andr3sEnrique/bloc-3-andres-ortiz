@@ -109,3 +109,17 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+
+CREATE TABLE `emprunts` (
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `livre_id` INT NOT NULL,
+  `utilisateur_id` INT NOT NULL,
+  `date_emprunt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `date_retour_prevue` TIMESTAMP NULL DEFAULT NULL,
+  `date_retour_effective` TIMESTAMP NULL DEFAULT NULL,
+  KEY `livre_id` (`livre_id`),
+  KEY `utilisateur_id` (`utilisateur_id`),
+  CONSTRAINT `emprunts_ibfk_1` FOREIGN KEY (`livre_id`) REFERENCES `livres` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `emprunts_ibfk_2` FOREIGN KEY (`utilisateur_id`) REFERENCES `utilisateurs` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

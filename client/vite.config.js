@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react'
 export default ({ mode }) => {
   process.env = {...process.env, ...loadEnv(mode, process.cwd())};
   return defineConfig({
-    //base: `${process.env.VITE_BASE_URL === '/' ?'' :process.env.VITE_BASE_URL}`,
+    base: `${process.env.VITE_BASE_URL === '/' ?'' :process.env.VITE_BASE_URL}`,
     plugins: [react()],
     build: {
       outDir: './../webpub'

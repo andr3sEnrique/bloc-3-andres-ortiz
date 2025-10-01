@@ -1,15 +1,48 @@
 {
   "scripts": {
-    "prod": "nodemon app.js"
+    "prod": "nodemon app.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverageFrom": [
+      "router/**/*.js",
+      "services/**/*.js",
+      "*.js",
+      "!node_modules/**",
+      "!client/**",
+      "!webpub/**",
+      "!coverage/**"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.js",
+      "**/?(*.)+(spec|test).js"
+    ],
+    "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"]
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
+    "cron": "^4.3.3",
+    "csurf": "^1.11.0",
+    "dotenv": "^17.2.3",
     "express": "^4.19.2",
+    "express-rate-limit": "^8.1.0",
+    "express-validator": "^7.2.1",
+    "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.10.0",
-    "nodemon": "^3.1.4"
+    "nodemailer": "^7.0.6",
+    "nodemon": "^3.1.4",
+    "xss": "^1.0.15"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4"
   }
 }

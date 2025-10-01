@@ -1,15 +1,44 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { isConnected, isAdmin } from './utils/auth'
 const base = import.meta.env.VITE_BASE_URL || '/'
 
 const AddBook = () => {
+    const navigate = useNavigate()
     const [cover, setCover] = useState('')
     const [title, setTitle] = useState('')
     const [author, setAuthor] = useState('')
+    const [user, setUser] = useState(null);
     const [description, setDescription] = useState('')
     const [datePublication, setDatePublication] = useState('')
     const [isbn, setIsbn] = useState('')
     const [errors, setErrors] = useState([])
     const [success, setSuccess] = useState(false)
+
+    useEffect(() => {
+        fetch(base + 'api/session', {
+            credentials: 'include'
+        })
+        .then(response => {
+            if (!isConnected(response, navigate)) {
+                return;
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data) {
+                setUser(data.user);
+                if (!isAdmin(data.user, navigate)) {
+                    return;
+                }
+                console.log('User ID:', data.user.id);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            navigate('/login');
+        });
+    }, [navigate])
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -22,11 +51,12 @@ const AddBook = () => {
             author,
             description,
             date_publication: datePublication,
-            isbn
+            isbn,
+            created_by: user?.id
         }
 
         try {
-            const response = await fetch(base+'api/books', {
+            const response = await fetch(base + 'api/books', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -45,9 +75,14 @@ const AddBook = () => {
                 setIsbn('')
             } else {
                 const errorData = await response.json()
-                setErrors(errorData.errors || ['Une erreur est survenue'])
+                if (errorData.errors) {
+                    setErrors(errorData.errors.map(err => err.msg || err))
+                } else {
+                    setErrors([errorData.error || 'Une erreur est survenue'])
+                }
             }
         } catch (error) {
+            console.error('Error adding book:', error)
             setErrors([error.message])
         }
     }
